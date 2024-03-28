@@ -6,18 +6,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\InventoryBundle\Entity\Stock;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
+use App\InventoryBundle\Service\StockService;
 
 class StockController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
+    private StockService $stockService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(StockService $stockService)
     {
-        $this->entityManager = $entityManager;
+        $this->stockService = $stockService;
     }
 
     /**
@@ -25,7 +22,7 @@ class StockController extends AbstractController
      */
     public function index(): Response
     {
-        $stocks = $this->entityManager->getRepository(Stock::class)->findAll();
+        $stocks = $this->stockService->getAllStocks();
 
         return $this->render('@InventoryBundle/stock/index.html.twig', [
             'stocks' => $stocks,
@@ -37,43 +34,12 @@ class StockController extends AbstractController
      *
      * @Route("/stock/save", name="stock_save", methods={"POST"})
      */
-    public function save(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): Response
+    public function save(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
+        $response = $this->stockService->saveStockData($data);
 
-        $stock = new Stock();
-        $stock->setSku($data['sku']);
-        $stock->setBranch($data['branch']);
-        $stock->setStock($data['stock']);
-
-        // Validate the stock object
-        $errors = $validator->validate($stock);
-
-        if (count($errors) > 0) {
-            $errorsString = $this->serializeValidationErrors($errors);
-            return new Response($errorsString, Response::HTTP_BAD_REQUEST);
-        }
-
-        $entityManager->persist($stock);
-        $entityManager->flush();
-
-        return new Response('Stock data saved successfully', Response::HTTP_CREATED);
+        return new Response($response['message'], $response['status']);
     }
 
-    /**
-     * Serializes validation errors to a string.
-     *
-     * @param ConstraintViolationListInterface $errors Validation errors
-     * @return string Serialized errors
-     */
-    private function serializeValidationErrors(ConstraintViolationListInterface $errors): string
-    {
-        $errorsString = '';
-
-        foreach ($errors as $error) {
-            $errorsString .= $error->getPropertyPath() . ': ' . $error->getMessage() . "\n";
-        }
-
-        return $errorsString;
-    }
 }

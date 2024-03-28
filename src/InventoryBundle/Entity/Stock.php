@@ -2,6 +2,7 @@
 namespace App\InventoryBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Represents the stock level of a product at a specific branch.

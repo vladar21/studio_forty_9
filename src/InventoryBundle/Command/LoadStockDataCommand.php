@@ -9,16 +9,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use App\InventoryBundle\Entity\Stock;
 use Doctrine\ORM\EntityManagerInterface;
+use App\InventoryBundle\Service\StockService;
 
 class LoadStockDataCommand extends Command
 {
     protected static $defaultName = 'app:load-stock-data';
     private EntityManagerInterface $entityManager;
+    private StockService $stockService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, StockService $stockService)
     {
         parent::__construct();
         $this->entityManager = $entityManager;
+        $this->stockService = $stockService;
     }
 
     protected function configure(): void
@@ -48,7 +51,10 @@ class LoadStockDataCommand extends Command
                     'branch' => $data[1],
                 ]);
 
-                if (!$stock) {
+                $previousStock = null;
+                if ($stock) {
+                    $previousStock = $stock->getStock();
+                } else {
                     $stock = new Stock();
                     $stock->setSku($data[0]);
                     $stock->setBranch($data[1]);
@@ -56,6 +62,8 @@ class LoadStockDataCommand extends Command
 
                 $stock->setStock((float) $data[2]);
                 $this->entityManager->persist($stock);
+
+                $this->stockService->handleStockChange($stock, $previousStock);
             }
             fclose($handle);
             $this->entityManager->flush();
