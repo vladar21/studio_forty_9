@@ -1,0 +1,27 @@
+{# templates/stocks/index.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Stock List{% endblock %}
+
+{% block body %}
+    <h2>Stock List</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>SKU</th>
+            <th>Branch</th>
+            <th>Stock</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for stock in stocks %}
+            <tr>
+                <td>{{ stock.sku }}</td>
+                <td>{{ stock.branch }}</td>
+                <td>{{ stock.stock }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
