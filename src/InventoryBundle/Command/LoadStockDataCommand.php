@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class LoadStockDataCommand extends Command
 {
     protected static $defaultName = 'app:load-stock-data';
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {

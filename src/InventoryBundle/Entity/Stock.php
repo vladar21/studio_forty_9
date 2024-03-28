@@ -27,9 +27,9 @@ class Stock
     private string $branch;
 
     /**
-     * @ORM\Column(type="decimal", scale=2)
+     * @ORM\Column(type="decimal", precision=10, scale=2)
      */
-    private float $stock;
+    private $stock;
 
     // Getters and setters
 
@@ -70,7 +70,6 @@ class Stock
     public function setStock(float $stock): self
     {
         $this->stock = $stock;
-
         return $this;
     }
 
