@@ -1,0 +1,3 @@
+services:
+  App\InventoryBundle\MessageHandler\StockOutMessageHandler:
+    tags: ['messenger.message_handler']
