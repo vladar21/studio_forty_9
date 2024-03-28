@@ -1,0 +1,13 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  App\InventoryBundle\Service\StockService:
+    arguments:
+      $entityManager: '@doctrine.orm.entity_manager'
+      $messageBus: '@messenger.bus.default'
+      $validator: '@validator'
+
+  Doctrine\ORM\EntityManagerInterface: '@doctrine.orm.entity_manager'

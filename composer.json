@@ -50,7 +50,8 @@
         "symfony/maker-bundle": "^1.0",
         "symfony/phpunit-bridge": "^7.0",
         "symfony/stopwatch": "5.4.*",
-        "symfony/web-profiler-bundle": "5.4.*"
+        "symfony/web-profiler-bundle": "5.4.*",
+        "mikey179/vfsstream": "^1.6"
     },
     "config": {
         "allow-plugins": {
