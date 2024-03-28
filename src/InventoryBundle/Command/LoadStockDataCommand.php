@@ -7,10 +7,18 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use App\InventoryBundle\Entity\Stock;
 
 class LoadStockDataCommand extends Command
 {
     protected static $defaultName = 'app:load-stock-data';
+    private $entityManager;
+
+    public function __construct(\Doctrine\ORM\EntityManagerInterface $entityManager)
+    {
+        parent::__construct();
+        $this->entityManager = $entityManager;
+    }
 
     protected function configure(): void
     {
@@ -31,13 +39,16 @@ class LoadStockDataCommand extends Command
 
         $io->success('Loading stock data from: ' . $csvPath);
 
-        // Example of reading CSV data
         if (($handle = fopen($csvPath, "r")) !== FALSE) {
+            fgetcsv($handle); // Skip header
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                // Process each row of the CSV here
-                // For example, output the first column of each row
-                $io->note('Processing item: ' . $data[0]);
+                $stock = new Stock();
+                $stock->setSku($data[0]);
+                $stock->setBranch($data[1]);
+                $stock->setStock((float)$data[2]);
+                $this->entityManager->persist($stock);
             }
+            $this->entityManager->flush();
             fclose($handle);
         }
 
