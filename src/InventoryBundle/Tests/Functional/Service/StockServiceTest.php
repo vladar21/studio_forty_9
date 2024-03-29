@@ -12,12 +12,19 @@ use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 /**
  * Functional tests for the StockService class.
  *
- * Tests the behavior of the StockService class methods.
+ * Tests the behavior of the StockService class methods by simulating various scenarios
+ * and verifying that the expected results are obtained.
  */
 class StockServiceTest extends KernelTestCase
 {
     /**
      * Tests that saving stock data with zero stock generates a StockOutMessage.
+     *
+     * This method boots the Symfony kernel to initialize the container, sets up
+     * necessary dependencies such as the entity manager and message bus mocks,
+     * creates a mock for the validator interface, and then invokes the
+     * saveStockData method of the StockService class with test data. Finally,
+     * it asserts that the method returns the expected HTTP status code.
      */
     public function testSaveStockDataGeneratesStockOutMessage(): void
     {
@@ -29,6 +36,7 @@ class StockServiceTest extends KernelTestCase
             throw new \LogicException('Entity manager not found');
         }
 
+        // Drop and recreate the database schema
         $metadatas = $entityManager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($entityManager);
         $schemaTool->dropDatabase();

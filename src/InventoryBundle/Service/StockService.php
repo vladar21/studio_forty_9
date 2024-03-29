@@ -21,7 +21,9 @@ class StockService
     /**
      * Constructor.
      *
+     * @param EntityManagerInterface $entityManager The entity manager.
      * @param MessageBusInterface $messageBus The message bus for dispatching messages.
+     * @param ValidatorInterface $validator The validator for validating stock data.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -33,11 +35,22 @@ class StockService
         $this->validator = $validator;
     }
 
-    public function getAllStocks()
+    /**
+     * Retrieves all stock data.
+     *
+     * @return array All stock data.
+     */
+    public function getAllStocks(): array
     {
         return $this->entityManager->getRepository(Stock::class)->findAll();
     }
 
+    /**
+     * Saves stock data.
+     *
+     * @param array $data The stock data to save.
+     * @return array The response status and message.
+     */
     public function saveStockData(array $data): array
     {
         $stock = new Stock();
@@ -61,10 +74,11 @@ class StockService
         $previousStock = $existingStock ? $existingStock->getStock() : null;
         $this->handleStockChange($stock, $previousStock);
 
-        // Here we dispatch the message
+        // Dispatch the stock out messag
         $message = new StockOutMessage($stock->getSku(), $stock->getBranch());
         $this->messageBus->dispatch($message);
 
+        // Persist the stock data
         $this->entityManager->persist($stock);
         $this->entityManager->flush();
 
@@ -73,6 +87,9 @@ class StockService
 
     /**
      * Handles the change in stock data.
+     *
+     * @param Stock $stock The stock entity.
+     * @param float|null $previousStock The previous stock value.
      */
     public function handleStockChange(Stock $stock, ?float $previousStock): void
     {
