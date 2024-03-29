@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\InventoryBundle\Service\StockService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class StockController extends AbstractController
 {
@@ -34,12 +35,12 @@ class StockController extends AbstractController
      *
      * @Route("/stock/save", name="stock_save", methods={"POST"})
      */
-    public function save(Request $request): Response
+    public function save(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $response = $this->stockService->saveStockData($data);
 
-        return new Response($response['message'], $response['status']);
+        return new JsonResponse(['message' => $response['message']], $response['status']);
     }
 
 }

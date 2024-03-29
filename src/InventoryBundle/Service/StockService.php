@@ -61,6 +61,10 @@ class StockService
         $previousStock = $existingStock ? $existingStock->getStock() : null;
         $this->handleStockChange($stock, $previousStock);
 
+        // Here we dispatch the message
+        $message = new StockOutMessage($stock->getSku(), $stock->getBranch());
+        $this->messageBus->dispatch($message);
+
         $this->entityManager->persist($stock);
         $this->entityManager->flush();
 
